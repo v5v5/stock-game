@@ -4,8 +4,11 @@
 import csv
 
 path_to_data_file = "./RTSI_190603_200604_60.csv"
-max_count_of_days = 2
-column_name_date = '<DATE>'
+max_count_of_days = 1
+DATE = '<DATE>'
+TIME = '<TIME>'
+OPEN = '<OPEN>'
+CLOSE = '<CLOSE>'
 
 class csv_dialect(csv.excel):
     """Describe the usual properties of Excel-generated CSV files."""
@@ -20,7 +23,7 @@ def read_input_data(path_to_file):
         reader = csv.DictReader(csvfile, dialect = csv_dialect)
 
         for row in reader:
-            current_date = row[column_name_date]
+            current_date = row[DATE]
             if current_date is not None and previous_date != None and current_date != previous_date:
                 block_of_days.append(block_of_day.copy())
                 block_of_day.clear()
@@ -43,14 +46,38 @@ def print_input_data(input_data):
         print_input_data_of_day(input_data_of_day)
         print()
 
-def alalysis_input_data_of_day(income_of_day):
-    # print_input_data_of_day(income_of_day)
-    ...
+def alalysis_input_data_of_day(input_data_of_day):
+    # print(input_data_of_day)
+    # print_input_data_of_day(input_data_of_day)
+    calculate_combination(input_data_of_day)
+
+def calculate_combination(input_data_of_day):
+    data = input_data_of_day
+    l = len(data)
+    count = 0
+    for in_open in range(0, l):
+        for in_close in range(in_open, l):
+            for out_open in range(in_close + 1, l):
+                for out_close in range(out_open, l):
+                    str = (
+                        f'in{data[in_open][TIME]}'
+                        f'in{data[in_close][TIME]}'
+                        f'out{data[out_open][TIME]}'
+                        f'out{data[out_close][TIME]}'
+                        )
+                    print(str)
+                    # print(in_open, in_close, out_open, out_close)
+                    count += 1
+    print(count)
+
+    # time0 = data[0].get(TIME)
+    # time1 = data[1].get(TIME)
+    # print(time0 > time1)
 
 input_data = read_input_data(path_to_data_file)
 alalysis_input_data_of_day(input_data[0])
-print()
-alalysis_input_data_of_day(input_data[1])
+# print()
+# alalysis_input_data_of_day(input_data[1])
 
-print_input_data(input_data)
+# print_input_data(input_data)
 
