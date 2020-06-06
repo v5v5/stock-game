@@ -1,5 +1,7 @@
 # link to download data
 # https://www.finam.ru/profile/mirovye-indeksy/rts/export/?market=6&em=95&token=&code=RTSI&apply=0&df=4&mf=5&yf=2020&from=04.06.2020&dt=4&mt=5&yt=2020&to=04.06.2020&p=7&f=RTSI_200604_200604&e=.txt&cn=RTSI&dtf=1&tmf=1&MSOR=1&mstime=on&mstimever=1&sep=1&sep2=1&datf=1&at=1
+# request to download
+# http://export.finam.ru/export9.out?market=6&em=95&token=03AGdBq26wCFtnU2koW48zWpyij4m149u0Dz7zTyg0rjHp6GXg7uBgyfxe3_hhMh0MXT4HiWt2uUlH5Ip4_0b1spURQRGSr5CnFWfhtmeN6pjlUdZHgDllTrkFEal3KqV70O42reEpuR5mMHUx16onlfB2E_z446U2fsVP9ZTBpXq_GF48lqDv9kUvb7ji-HSHfCVc0DzBu7weCPm_yShHMqKJXWYdzSojnMNr8UwtYDNFSzDncb7rFplfxIPtMoVk9Umu-LMc3VyWe2Adkyjr0mJ6h4Kar1KXo6gKu6k33WJB4t_zkFQ8A2hXJVdmQGruGHN9d7E-QBF2GdpQ8gz0nAH6iGqveOAu1Ol73etKtyUC2dKEo2vueuVZQ-NEapr681hJugLI25aa&code=RTSI&apply=0&df=3&mf=5&yf=2019&from=03.06.2019&dt=4&mt=5&yt=2020&to=04.06.2020&p=7&f=RTSI_190603_200604_60&e=.csv&cn=RTSI&dtf=4&tmf=4&MSOR=0&mstime=on&mstimever=1&sep=3&sep2=1&datf=1&at=1
 
 import csv
 
@@ -47,32 +49,34 @@ def print_input_data(input_data):
         print()
 
 def alalysis_input_data_of_day(input_data_of_day):
-    # print(input_data_of_day)
-    # print_input_data_of_day(input_data_of_day)
-    calculate_combination(input_data_of_day)
+    set_sequence = calculate_sets_sequence(input_data_of_day)
+    print(set_sequence)
 
-def calculate_combination(input_data_of_day):
+def calculate_sets_sequence(input_data_of_day):
     data = input_data_of_day
     l = len(data)
     count = 0
-    for in_open in range(0, l):
-        for in_close in range(in_open, l):
-            for out_open in range(in_close + 1, l):
-                for out_close in range(out_open, l):
-                    str = (
-                        f'in{data[in_open][TIME]}'
-                        f'in{data[in_close][TIME]}'
-                        f'out{data[out_open][TIME]}'
-                        f'out{data[out_close][TIME]}'
+    set_sequence = {}
+    for i_in_open in range(0, l):
+        for i_in_close in range(i_in_open, l):
+            for i_out_open in range(i_in_close + 1, l):
+                for i_out_close in range(i_out_open, l):
+                    set_name = (
+                        f'in{data[i_in_open][TIME]}-'
+                        f'in{data[i_in_close][TIME]}-'
+                        f'out{data[i_out_open][TIME]}-'
+                        f'out{data[i_out_close][TIME]}'
                         )
-                    print(str)
-                    # print(in_open, in_close, out_open, out_close)
+                    
+                    set_sequence[set_name] = []
+                    data_in = ((float(data[i_in_close][CLOSE]) - float(data[i_in_open][OPEN])) /
+                        float(data[i_in_open][OPEN]))
+                    data_out = ((float(data[i_out_close][CLOSE]) - float(data[i_out_open][OPEN])) /
+                        float(data[i_out_open][OPEN]))
+                    set_sequence[set_name].append((data_in, data_out))
                     count += 1
-    print(count)
-
-    # time0 = data[0].get(TIME)
-    # time1 = data[1].get(TIME)
-    # print(time0 > time1)
+    # print(count)
+    return set_sequence
 
 input_data = read_input_data(path_to_data_file)
 alalysis_input_data_of_day(input_data[0])
