@@ -63,6 +63,12 @@ def alalysis_input_data_of_day(input_data_of_day):
         r = np.corrcoef(value[0], value[1])
         print(r)
 
+def alalysis_input_data_of_days(input_data):
+    set_sequence = calculate_sets_sequence(input_data[0])
+    for input_data_of_day in input_data:
+        calculate_sets_sequence(input_data_of_day)
+        pass
+
 def calculate_sets_sequence(input_data_of_day):
     data = input_data_of_day
     l = len(data)
@@ -95,6 +101,8 @@ input_data = read_input_data(path_to_data_file)
 alalysis_input_data_of_day(input_data[0])
 # print()
 # alalysis_input_data_of_day(input_data[1])
+
+alalysis_input_data_of_days(input_data)
 
 # print_input_data(input_data)
 
