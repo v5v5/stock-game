@@ -5,6 +5,8 @@
 
 import csv
 import numpy as np
+import random
+import datetime
 
 path_to_data_file = "./RTSI_190603_200604_60.csv"
 max_count_of_days = 1
@@ -51,11 +53,15 @@ def print_input_data(input_data):
 
 def alalysis_input_data_of_day(input_data_of_day):
     set_sequence = calculate_sets_sequence(input_data_of_day)
+    maxx = max(max(set_sequence.values()))[0]
+    minn = min(min(set_sequence.values()))[0]
     for key, value in set_sequence.items():
         print(key)
-        print(value[0])
-        print(value[1])
-    # print(set_sequence)
+        for _ in range(0,10):
+            value[0].append(random.uniform(minn, maxx))
+            value[1].append(random.uniform(minn, maxx))
+        r = np.corrcoef(value[0], value[1])
+        print(r)
 
 def calculate_sets_sequence(input_data_of_day):
     data = input_data_of_day
@@ -84,6 +90,7 @@ def calculate_sets_sequence(input_data_of_day):
     # print(count)
     return set_sequence
 
+random.seed(datetime.datetime.now())
 input_data = read_input_data(path_to_data_file)
 alalysis_input_data_of_day(input_data[0])
 # print()
