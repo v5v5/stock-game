@@ -51,91 +51,47 @@ def print_input_data(input_data):
         print_input_data_of_day(input_data_of_day)
         print()
 
-def alalysis_input_data_of_day(input_data_of_day):
-    set_sequence = calculate_sets_sequence(input_data_of_day)
-    maxx = max(max(set_sequence.values()))[0]
-    minn = min(min(set_sequence.values()))[0]
-    for key, value in set_sequence.items():
-        print(key)
-        for _ in range(0,10):
-            value[0].append(random.uniform(minn, maxx))
-            value[1].append(random.uniform(minn, maxx))
-        r = np.corrcoef(value[0], value[1])
-        print(r)
-
-class C:    
+class CalculationData:    
     def __init__(self):
         self.data_in = []
         self.data_out = []
         self.corrcoef = 0
 
-def alalysis_input_data_of_days(input_data):
-    set_sequence = {}
-    for input_data_of_day in input_data:
-        data = input_data_of_day
-        l = len(data)
-        count = 0
-        for i_in_open in range(0, l):
-            for i_in_close in range(i_in_open, l):
-                for i_out_open in range(i_in_close + 1, l):
-                    for i_out_close in range(i_out_open, l):
-                        set_name = (
-                            f'inopen{data[i_in_open][TIME]}-'
-                            f'inclose{data[i_in_close][TIME]}-'
-                            f'outopen{data[i_out_open][TIME]}-'
-                            f'outclose{data[i_out_close][TIME]}'
-                            )
-                        
-                        if set_name not in set_sequence:
-                            # set_sequence[set_name] = [[],[],0]
-                            set_sequence[set_name] = C()
-                        data_in = ((float(data[i_in_close][CLOSE]) - float(data[i_in_open][OPEN])) /
-                            float(data[i_in_open][OPEN]))
-                        data_out = ((float(data[i_out_close][CLOSE]) - float(data[i_out_open][OPEN])) /
-                            float(data[i_out_open][OPEN]))
-                        # set_sequence[set_name][0].append(data_in)
-                        # set_sequence[set_name][1].append(data_out)
-                        set_sequence[set_name].data_in.append(data_in)
-                        set_sequence[set_name].data_out.append(data_out)
-                        count += 1
-
-    for _, value in set_sequence.items():
-        # data_in = value[0]
-        # data_out = value[1]
-        data_in = value.data_in
-        data_out = value.data_out
-        r = np.corrcoef(data_in, data_out)
-        # value[2] = r
-        value.corrcoef = r
-
-    return set_sequence
-
-def calculate_sets_sequence(input_data_of_day):
-    set_sequence = {}
-
-    data = input_data_of_day
+def alalysis_input_data_of_day(data_of_day, set_sequence = {}):
+    data = data_of_day
     l = len(data)
-    count = 0
     for i_in_open in range(0, l):
         for i_in_close in range(i_in_open, l):
             for i_out_open in range(i_in_close + 1, l):
                 for i_out_close in range(i_out_open, l):
                     set_name = (
-                        f'in{data[i_in_open][TIME]}-'
-                        f'in{data[i_in_close][TIME]}-'
-                        f'out{data[i_out_open][TIME]}-'
-                        f'out{data[i_out_close][TIME]}'
+                        f'inopen{data[i_in_open][TIME]}-'
+                        f'inclose{data[i_in_close][TIME]}-'
+                        f'outopen{data[i_out_open][TIME]}-'
+                        f'outclose{data[i_out_close][TIME]}'
                         )
                     
-                    set_sequence[set_name] = ([],[])
+                    if set_name not in set_sequence:
+                        set_sequence[set_name] = CalculationData()
                     data_in = ((float(data[i_in_close][CLOSE]) - float(data[i_in_open][OPEN])) /
                         float(data[i_in_open][OPEN]))
                     data_out = ((float(data[i_out_close][CLOSE]) - float(data[i_out_open][OPEN])) /
                         float(data[i_out_open][OPEN]))
-                    set_sequence[set_name][0].append(data_in)
-                    set_sequence[set_name][1].append(data_out)
-                    count += 1
-    # print(count)
+                    set_sequence[set_name].data_in.append(data_in)
+                    set_sequence[set_name].data_out.append(data_out)
+    return set_sequence
+
+def alalysis_input_data_of_days(input_data):
+    set_sequence = {}
+    for input_data_of_day in input_data:
+        set_sequence = alalysis_input_data_of_day(input_data_of_day, set_sequence)
+
+    for _, value in set_sequence.items():
+        data_in = value.data_in
+        data_out = value.data_out
+        r = np.corrcoef(data_in, data_out)
+        value.corrcoef = r
+
     return set_sequence
 
 random.seed(datetime.datetime.now())
