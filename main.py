@@ -96,28 +96,28 @@ def alalysis_input_data_of_days(input_data):
 
 random.seed(datetime.datetime.now())
 input_data = read_input_data(path_to_data_file)
-# alalysis_input_data_of_day(input_data[0])
-# print()
-# alalysis_input_data_of_day(input_data[1])
+# d = alalysis_input_data_of_day(input_data[0])
+# for key, value in d.items():
+#     print(key)
+#     print(value.data_in)
+#     print(value.data_out)
+#     print(value.corrcoef)
+# raise SystemExit
+# d = alalysis_input_data_of_day(input_data[1])
+# for key, value in d.items():
+#     print(key)
+#     print(value.data_in)
+#     print(value.data_out)
+#     print(value.corrcoef)
+# raise SystemExit
 
 set_sequence = alalysis_input_data_of_days(input_data)
-# for _, value in set_sequence.items():
-#     print(max(value[2][0, 1]))
-#     print(min(value[2][0, 1]))
-# corrcoefs = tuple(map(lambda v: v[2][0,1], set_sequence.values()))
 corrcoefs = tuple(map(lambda v: v.corrcoef[0,1], set_sequence.values()))
 maxx = max(corrcoefs)
 print(maxx)
 minn = min(corrcoefs)
 print(minn)
-# key_maxx = [k for k,v in set_sequence.items() if float(v[2][0,1]) == maxx]
 key_maxx = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx]
 print(key_maxx)
-# key_minn = [k for k,v in set_sequence.items() if float(v[2][0,1]) == minn]
 key_minn = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == minn]
 print(key_minn)
-
-# print(min((set_sequence.values()[2])))
-
-
-# print_input_data(input_data)
