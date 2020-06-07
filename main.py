@@ -9,7 +9,7 @@ import random
 import datetime
 
 path_to_data_file = "./RTSI_190603_200604_60.csv"
-max_count_of_days = 1
+max_count_of_days = 300
 DATE = '<DATE>'
 TIME = '<TIME>'
 OPEN = '<OPEN>'
@@ -63,17 +63,48 @@ def alalysis_input_data_of_day(input_data_of_day):
         r = np.corrcoef(value[0], value[1])
         print(r)
 
+
 def alalysis_input_data_of_days(input_data):
-    set_sequence = calculate_sets_sequence(input_data[0])
+    set_sequence = {}
     for input_data_of_day in input_data:
-        calculate_sets_sequence(input_data_of_day)
-        pass
+        data = input_data_of_day
+        l = len(data)
+        count = 0
+        for i_in_open in range(0, l):
+            for i_in_close in range(i_in_open, l):
+                for i_out_open in range(i_in_close + 1, l):
+                    for i_out_close in range(i_out_open, l):
+                        set_name = (
+                            f'in{data[i_in_open][TIME]}-'
+                            f'in{data[i_in_close][TIME]}-'
+                            f'out{data[i_out_open][TIME]}-'
+                            f'out{data[i_out_close][TIME]}'
+                            )
+                        
+                        if set_name not in set_sequence:
+                            set_sequence[set_name] = [[],[],0]
+                        data_in = ((float(data[i_in_close][CLOSE]) - float(data[i_in_open][OPEN])) /
+                            float(data[i_in_open][OPEN]))
+                        data_out = ((float(data[i_out_close][CLOSE]) - float(data[i_out_open][OPEN])) /
+                            float(data[i_out_open][OPEN]))
+                        set_sequence[set_name][0].append(data_in)
+                        set_sequence[set_name][1].append(data_out)
+                        count += 1
+
+    for _, value in set_sequence.items():
+        data_in = value[0]
+        data_out = value[1]
+        r = np.corrcoef(data_in, data_out)
+        value[2] = r
+
+    return set_sequence
 
 def calculate_sets_sequence(input_data_of_day):
+    set_sequence = {}
+
     data = input_data_of_day
     l = len(data)
     count = 0
-    set_sequence = {}
     for i_in_open in range(0, l):
         for i_in_close in range(i_in_open, l):
             for i_out_open in range(i_in_close + 1, l):
@@ -98,11 +129,25 @@ def calculate_sets_sequence(input_data_of_day):
 
 random.seed(datetime.datetime.now())
 input_data = read_input_data(path_to_data_file)
-alalysis_input_data_of_day(input_data[0])
+# alalysis_input_data_of_day(input_data[0])
 # print()
 # alalysis_input_data_of_day(input_data[1])
 
-alalysis_input_data_of_days(input_data)
+set_sequence = alalysis_input_data_of_days(input_data)
+# for _, value in set_sequence.items():
+#     print(max(value[2][0, 1]))
+#     print(min(value[2][0, 1]))
+corrcoefs = tuple(map(lambda v: v[2][0,1], set_sequence.values()))
+maxx = max(corrcoefs)
+print(maxx)
+minn = min(corrcoefs)
+print(minn)
+key_maxx = [k for k,v in set_sequence.items() if float(v[2][0,1]) == maxx]
+print(key_maxx)
+key_minn = [k for k,v in set_sequence.items() if float(v[2][0,1]) == minn]
+print(key_minn)
+
+# print(min((set_sequence.values()[2])))
+
 
 # print_input_data(input_data)
-
