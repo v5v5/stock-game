@@ -63,6 +63,11 @@ def alalysis_input_data_of_day(input_data_of_day):
         r = np.corrcoef(value[0], value[1])
         print(r)
 
+class C:    
+    def __init__(self):
+        self.data_in = []
+        self.data_out = []
+        self.corrcoef = 0
 
 def alalysis_input_data_of_days(input_data):
     set_sequence = {}
@@ -75,27 +80,33 @@ def alalysis_input_data_of_days(input_data):
                 for i_out_open in range(i_in_close + 1, l):
                     for i_out_close in range(i_out_open, l):
                         set_name = (
-                            f'in{data[i_in_open][TIME]}-'
-                            f'in{data[i_in_close][TIME]}-'
-                            f'out{data[i_out_open][TIME]}-'
-                            f'out{data[i_out_close][TIME]}'
+                            f'inopen{data[i_in_open][TIME]}-'
+                            f'inclose{data[i_in_close][TIME]}-'
+                            f'outopen{data[i_out_open][TIME]}-'
+                            f'outclose{data[i_out_close][TIME]}'
                             )
                         
                         if set_name not in set_sequence:
-                            set_sequence[set_name] = [[],[],0]
+                            # set_sequence[set_name] = [[],[],0]
+                            set_sequence[set_name] = C()
                         data_in = ((float(data[i_in_close][CLOSE]) - float(data[i_in_open][OPEN])) /
                             float(data[i_in_open][OPEN]))
                         data_out = ((float(data[i_out_close][CLOSE]) - float(data[i_out_open][OPEN])) /
                             float(data[i_out_open][OPEN]))
-                        set_sequence[set_name][0].append(data_in)
-                        set_sequence[set_name][1].append(data_out)
+                        # set_sequence[set_name][0].append(data_in)
+                        # set_sequence[set_name][1].append(data_out)
+                        set_sequence[set_name].data_in.append(data_in)
+                        set_sequence[set_name].data_out.append(data_out)
                         count += 1
 
     for _, value in set_sequence.items():
-        data_in = value[0]
-        data_out = value[1]
+        # data_in = value[0]
+        # data_out = value[1]
+        data_in = value.data_in
+        data_out = value.data_out
         r = np.corrcoef(data_in, data_out)
-        value[2] = r
+        # value[2] = r
+        value.corrcoef = r
 
     return set_sequence
 
@@ -137,14 +148,17 @@ set_sequence = alalysis_input_data_of_days(input_data)
 # for _, value in set_sequence.items():
 #     print(max(value[2][0, 1]))
 #     print(min(value[2][0, 1]))
-corrcoefs = tuple(map(lambda v: v[2][0,1], set_sequence.values()))
+# corrcoefs = tuple(map(lambda v: v[2][0,1], set_sequence.values()))
+corrcoefs = tuple(map(lambda v: v.corrcoef[0,1], set_sequence.values()))
 maxx = max(corrcoefs)
 print(maxx)
 minn = min(corrcoefs)
 print(minn)
-key_maxx = [k for k,v in set_sequence.items() if float(v[2][0,1]) == maxx]
+# key_maxx = [k for k,v in set_sequence.items() if float(v[2][0,1]) == maxx]
+key_maxx = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx]
 print(key_maxx)
-key_minn = [k for k,v in set_sequence.items() if float(v[2][0,1]) == minn]
+# key_minn = [k for k,v in set_sequence.items() if float(v[2][0,1]) == minn]
+key_minn = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == minn]
 print(key_minn)
 
 # print(min((set_sequence.values()[2])))
