@@ -7,9 +7,14 @@ import csv
 import numpy as np
 import random
 import datetime
+import time
 
-path_to_data_file = "./RTSI_190603_200604_60.csv"
-max_count_of_days = 300
+# path_to_data_file = "./RTSI_190603_200604_60.csv"
+# path_to_data_file = "./RTSI_190603_200604_15.csv"
+path_to_data_file = "./RTSI_180603_200604_15.csv"
+# path_to_data_file = "./RTSI_190603_200604_10.csv"
+# path_to_data_file = "./RTSI_190603_200604_05.csv"
+max_count_of_days = 600
 DATE = '<DATE>'
 TIME = '<TIME>'
 OPEN = '<OPEN>'
@@ -20,12 +25,14 @@ class csv_dialect(csv.excel):
     delimiter = ';'
 
 def read_input_data(path_to_file):
+    print("file data is reading...")
     current_date = None
     previous_date = None
     with open(path_to_file, newline='') as csvfile:
         block_of_days = []
         block_of_day = []
         reader = csv.DictReader(csvfile, dialect = csv_dialect)
+        print("line_num", reader.line_num)
 
         for row in reader:
             current_date = row[DATE]
@@ -33,10 +40,11 @@ def read_input_data(path_to_file):
                 block_of_days.append(block_of_day.copy())
                 block_of_day.clear()
                 if len(block_of_days) > max_count_of_days - 1:
-                    return block_of_days
+                    break
             previous_date = current_date
 
             block_of_day.append(row)
+        print("file data is read.")
         return block_of_days
 
 def print_input_data_of_day(input_data_of_day):
@@ -82,9 +90,12 @@ def alalysis_input_data_of_day(data_of_day, set_sequence = {}):
     return set_sequence
 
 def alalysis_input_data_of_days(input_data):
-    set_sequence = {}
+    count_calculation_days = 0
+    set_sequence = dict()
     for input_data_of_day in input_data:
         set_sequence = alalysis_input_data_of_day(input_data_of_day, set_sequence)
+        count_calculation_days += 1
+        print(count_calculation_days)
 
     for _, value in set_sequence.items():
         data_in = value.data_in
@@ -93,6 +104,8 @@ def alalysis_input_data_of_days(input_data):
         value.corrcoef = r
 
     return set_sequence
+
+start = time.time()
 
 random.seed(datetime.datetime.now())
 input_data = read_input_data(path_to_data_file)
@@ -114,10 +127,14 @@ input_data = read_input_data(path_to_data_file)
 set_sequence = alalysis_input_data_of_days(input_data)
 corrcoefs = tuple(map(lambda v: v.corrcoef[0,1], set_sequence.values()))
 maxx = max(corrcoefs)
-print(maxx)
+print('max:', maxx)
+key_maxx = {k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx}
+print('trade range:', key_maxx)
 minn = min(corrcoefs)
-print(minn)
-key_maxx = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx]
-print(key_maxx)
-key_minn = [k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == minn]
-print(key_minn)
+print('min:', minn)
+# key_minn = list(filter(lambda item: item[1].corrcoef[0,1] == minn, set_sequence.items()))
+key_minn = {k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == minn}
+print('trade range:', key_minn)
+
+end = time.time()
+print("calculation time", end - start)
