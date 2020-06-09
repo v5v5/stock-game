@@ -11,9 +11,14 @@ import time
 
 # path_to_data_file = "./RTSI_190603_200604_60.csv"
 # path_to_data_file = "./RTSI_190603_200604_15.csv"
-path_to_data_file = "./RTSI_180603_200604_15.csv"
+# path_to_data_file = "./RTSI_180603_200604_15.csv"
 # path_to_data_file = "./RTSI_190603_200604_10.csv"
 # path_to_data_file = "./RTSI_190603_200604_05.csv"
+# path_to_data_file = "./RTSI_200522_200605_01.csv"
+# path_to_data_file = "./RTSI_200601_200605_05.csv"
+# path_to_data_file = "./RTSI_200522_200605_10.csv"
+path_to_data_file = "./RTSI_200525_200605_10.csv"
+
 max_count_of_days = 600
 DATE = '<DATE>'
 TIME = '<TIME>'
@@ -25,39 +30,31 @@ class csv_dialect(csv.excel):
     delimiter = ';'
 
 def read_input_data(path_to_file):
-    print("file data is reading...")
+    print("reading file data is started...")
     current_date = None
     previous_date = None
     with open(path_to_file, newline='') as csvfile:
         block_of_days = []
         block_of_day = []
         reader = csv.DictReader(csvfile, dialect = csv_dialect)
-        print("line_num", reader.line_num)
 
         for row in reader:
             current_date = row[DATE]
             if current_date is not None and previous_date != None and current_date != previous_date:
                 block_of_days.append(block_of_day.copy())
                 block_of_day.clear()
+                print(f"{len(block_of_days)} blocks is read")
                 if len(block_of_days) > max_count_of_days - 1:
                     break
             previous_date = current_date
 
             block_of_day.append(row)
-        print("file data is read.")
+        else:
+            block_of_days.append(block_of_day.copy())
+            block_of_day.clear()
+            print(f"{len(block_of_days)} blocks is read")
+        print("reading file data is finished\r")
         return block_of_days
-
-def print_input_data_of_day(input_data_of_day):
-    for row in input_data_of_day:
-        for _, value in row.items():
-            print(value, end=' ')
-        print()
-
-def print_input_data(input_data):
-    for input_data_of_day in input_data:
-        print(input_data.index(input_data_of_day))
-        print_input_data_of_day(input_data_of_day)
-        print()
 
 class CalculationData:    
     def __init__(self):
@@ -90,21 +87,26 @@ def alalysis_input_data_of_day(data_of_day, set_sequence = {}):
     return set_sequence
 
 def alalysis_input_data_of_days(input_data):
+    print('data process is started...')
     count_calculation_days = 0
     set_sequence = dict()
     for input_data_of_day in input_data:
         set_sequence = alalysis_input_data_of_day(input_data_of_day, set_sequence)
         count_calculation_days += 1
-        print(count_calculation_days)
+        print('count calculated days ', count_calculation_days)
+    print('data process is finished\r')
 
+    print('correlation calculate is started...')
     for _, value in set_sequence.items():
         data_in = value.data_in
         data_out = value.data_out
         r = np.corrcoef(data_in, data_out)
         value.corrcoef = r
+    print('correlation calculate is finished...\r')
 
     return set_sequence
 
+# start of data process
 start = time.time()
 
 random.seed(datetime.datetime.now())
@@ -129,12 +131,13 @@ corrcoefs = tuple(map(lambda v: v.corrcoef[0,1], set_sequence.values()))
 maxx = max(corrcoefs)
 print('max:', maxx)
 key_maxx = {k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx}
-print('trade range:', key_maxx)
+print(f'trade range:{key_maxx}')
 minn = min(corrcoefs)
 print('min:', minn)
 # key_minn = list(filter(lambda item: item[1].corrcoef[0,1] == minn, set_sequence.items()))
 key_minn = {k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == minn}
-print('trade range:', key_minn)
+print(f'trade range:{key_minn}\r', )
 
+# end of data process
 end = time.time()
-print("calculation time", end - start)
+print("calculation time:", end - start)
