@@ -58,9 +58,9 @@ def read_input_data(path_to_file) -> List[List[Dict[str, str]]]:
         return block_of_days
 
 class CalculationData:
-    # self.data_in: t.List[float] = []
-    # self.data_out: t.List[float] = []
-    # self.corrcoef: float = 0
+    # data_in: t.List[float] = []
+    # data_out: t.List[float] = []
+    # corrcoef: float = 0
     def __init__(self):
         self.data_in = []
         self.data_out = []
