@@ -8,6 +8,7 @@ import numpy as np
 import random
 import datetime
 import time
+from typing import Dict, List
 
 # path_to_data_file = "./RTSI_190603_200604_60.csv"
 # path_to_data_file = "./RTSI_190603_200604_15.csv"
@@ -17,7 +18,7 @@ import time
 # path_to_data_file = "./RTSI_200522_200605_01.csv"
 # path_to_data_file = "./RTSI_200601_200605_05.csv"
 # path_to_data_file = "./RTSI_200522_200605_10.csv"
-path_to_data_file = "./RTSI_200525_200605_10.csv"
+path_to_data_file = "./RTSI_200504_200612_10.csv"
 
 max_count_of_days = 600
 DATE = '<DATE>'
@@ -29,13 +30,13 @@ class csv_dialect(csv.excel):
     """Describe the usual properties of Excel-generated CSV files."""
     delimiter = ';'
 
-def read_input_data(path_to_file):
+def read_input_data(path_to_file) -> List[List[Dict[str, str]]]:
     print("reading file data is started...")
-    current_date = None
-    previous_date = None
+    current_date: str = None
+    previous_date: str = None
     with open(path_to_file, newline='') as csvfile:
-        block_of_days = []
-        block_of_day = []
+        block_of_days: List[List[Dict]]  = []
+        block_of_day: List[Dict] = []
         reader = csv.DictReader(csvfile, dialect = csv_dialect)
 
         for row in reader:
@@ -56,13 +57,17 @@ def read_input_data(path_to_file):
         print("reading file data is finished\r")
         return block_of_days
 
-class CalculationData:    
+class CalculationData:
+    # self.data_in: t.List[float] = []
+    # self.data_out: t.List[float] = []
+    # self.corrcoef: float = 0
     def __init__(self):
         self.data_in = []
         self.data_out = []
         self.corrcoef = 0
 
-def alalysis_input_data_of_day(data_of_day, set_sequence = {}):
+def analysis_input_data_of_day(data_of_day: List[Dict[str, str]], 
+set_sequence: Dict[str, CalculationData]) -> Dict[str, CalculationData]:
     data = data_of_day
     l = len(data)
     for i_in_open in range(0, l):
@@ -86,12 +91,13 @@ def alalysis_input_data_of_day(data_of_day, set_sequence = {}):
                     set_sequence[set_name].data_out.append(data_out)
     return set_sequence
 
-def alalysis_input_data_of_days(input_data):
+def analysis_input_data_of_days(input_data: List[List[Dict[str, str]]]) -> Dict[str, CalculationData]:
     print('data process is started...')
     count_calculation_days = 0
-    set_sequence = dict()
+    set_sequence: Dict[str, CalculationData] = {}
     for input_data_of_day in input_data:
-        set_sequence = alalysis_input_data_of_day(input_data_of_day, set_sequence)
+        # set_sequence = analysis_input_data_of_day(input_data_of_day, set_sequence)
+        analysis_input_data_of_day(input_data_of_day, set_sequence)
         count_calculation_days += 1
         print('count calculated days ', count_calculation_days)
     print('data process is finished\r')
@@ -111,6 +117,7 @@ start = time.time()
 
 random.seed(datetime.datetime.now())
 input_data = read_input_data(path_to_data_file)
+
 # d = alalysis_input_data_of_day(input_data[0])
 # for key, value in d.items():
 #     print(key)
@@ -126,11 +133,12 @@ input_data = read_input_data(path_to_data_file)
 #     print(value.corrcoef)
 # raise SystemExit
 
-set_sequence = alalysis_input_data_of_days(input_data)
+set_sequence = analysis_input_data_of_days(input_data)
 corrcoefs = tuple(map(lambda v: v.corrcoef[0,1], set_sequence.values()))
 maxx = max(corrcoefs)
 print('max:', maxx)
 key_maxx = {k for k,v in set_sequence.items() if float(v.corrcoef[0,1]) == maxx}
+# key_maxx = list(filter(lambda item: item[1].corrcoef[0,1] == maxx, set_sequence.items()))
 print(f'trade range:{key_maxx}')
 minn = min(corrcoefs)
 print('min:', minn)
