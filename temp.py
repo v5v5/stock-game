@@ -4,6 +4,7 @@ from string import Template
 import matplotlib.pyplot as plt
 from typing import List
 import numpy as np
+import math
 
 path_to_parameters = "//td[@class='rowTitle']"
 path_to_value = Template("""//td[@class='rowTitle' and text()="$params"]/../td[1<position() and position()<7]""")
@@ -58,6 +59,7 @@ y = valueCells[graph_name]
 x = np.arange(2020 - len(y), 2020, 1)
 plt.plot(x, y) 
 plt.xlabel('Years') 
+plt.xticks(range(min(x), math.ceil(max(x))+1))
 plt.ylabel('Values') 
 plt.title(graph_name) 
 plt.show() 
