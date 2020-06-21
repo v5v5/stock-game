@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from typing import List
 import numpy as np
 import math
+import datetime
 
 path_to_parameters = "//td[@class='rowTitle']"
 path_to_value = Template("""//td[@class='rowTitle' and text()="$params"]/../td[1<position() and position()<7]""")
@@ -54,9 +55,10 @@ for url in urls:
             print(' '*5, v)
             valueCells[parameter_name].append(v)
 
+now = datetime.datetime.now()
 graph_name = " Total Shareholders' Equity"
 y = valueCells[graph_name]
-x = np.arange(2020 - len(y), 2020, 1)
+x = np.arange(now.year - len(y), now.year, 1)
 plt.plot(x, y) 
 plt.xlabel('Years') 
 plt.xticks(range(min(x), math.ceil(max(x))+1))
