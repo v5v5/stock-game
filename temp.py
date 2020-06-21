@@ -1,6 +1,9 @@
 import requests
 from lxml import html
 from string import Template
+import matplotlib.pyplot as plt
+from typing import List
+import numpy as np
 
 path_to_parameters = "//td[@class='rowTitle']"
 path_to_value = Template("""//td[@class='rowTitle' and text()="$params"]/../td[1<position() and position()<7]""")
@@ -13,6 +16,23 @@ urls = {
     'https://www.marketwatch.com/investing/stock/' + ticker + '/financials/cash-flow'
 }
 
+def format_value(value: str) -> float:
+    value = value.replace('M', '000000')
+    value = value.replace('B', '000000000')
+    value = value.replace(',', '')
+    value = value.replace('.', '')
+    value = value.replace('%', '')
+    value = value.replace('(', '-')
+    value = value.replace(')', '')
+    f = None
+    try:
+        f = float(value)
+    except Exception:
+        pass
+    return f
+
+valueCells = {}
+
 for url in urls:
     print('*'*80)
     page = requests.get(url)
@@ -23,8 +43,21 @@ for url in urls:
         # parameter_name = p.text_content().strip()
         parameter_name = p.text_content()
         print(parameter_name)
+        valueCells[parameter_name] = []
         path_to_values = path_to_value.substitute(params=parameter_name)
         
         values = source_code.xpath(path_to_values)
         for value in values:
-            print(' '*5, value.text_content())
+            v = value.text_content()
+            v = format_value(v)
+            print(' '*5, v)
+            valueCells[parameter_name].append(v)
+
+graph_name = " Total Shareholders' Equity"
+y = valueCells[graph_name]
+x = np.arange(2020 - len(y), 2020, 1)
+plt.plot(x, y) 
+plt.xlabel('Years') 
+plt.ylabel('Values') 
+plt.title(graph_name) 
+plt.show() 
